@@ -475,15 +475,17 @@ def query_task(api_key, key_info, submit_id):
         status = task_data.get("status")
         item_list = task_data.get("item_list", [])
         
+        # 状态约定：20=processing，30=failed，其它视为已完成（兼容平台不同返回码，如50等）
         response = {
             'success': True,
             'submit_id': submit_id,
             'status': status,
-            'status_name': {20: 'processing', 10: 'completed', 30: 'failed'}.get(status, 'unknown'),
+            'status_name': 'processing' if status == 20 else ('failed' if status == 30 else 'completed'),
             'items': []
         }
         
-        if status == 10 and item_list:
+        # 非20（processing）时，如果有结果就返回图片列表
+        if status != 20 and item_list:
             for item in item_list:
                 try:
                     image_url = item['image']['large_images'][0]['image_url']
