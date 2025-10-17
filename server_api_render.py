@@ -166,15 +166,36 @@ class AccountPoolRender:
     def refresh_accounts(self):
         """刷新账号列表"""
         with self.lock:
-            accounts = [acc for acc in self.account_db.get_all_accounts() 
-                       if acc['status'] == 'active' and acc['id'] not in self.failed_accounts]
-            
+            raw_accounts = self.account_db.get_all_accounts() or []
+            accounts = []
+            auto_id = 1
+            for acc in raw_accounts:
+                if not isinstance(acc, dict):
+                    continue
+                status = acc.get('status', 'active')  # 兼容缺省字段
+                if status != 'active':
+                    continue
+                # 基本字段校验
+                session_id = acc.get('session_id')
+                did = acc.get('did')
+                if not session_id or not did:
+                    # 略过不完整条目
+                    continue
+                acc_id = acc.get('id') if isinstance(acc.get('id'), int) else None
+                if acc_id is None:
+                    acc_id = auto_id
+                    auto_id += 1
+                if acc_id in self.failed_accounts:
+                    continue
+                acc['id'] = acc_id
+                accounts.append(acc)
+
             if not accounts:
-                print("[WARNING] 没有可用账号！")
+                print("[WARNING] 没有可用账号！(可能 accounts_database.json 缺少 status/id/session_id/did 字段)")
                 self.account_list = []
                 self.account_cycle = None
                 return
-            
+
             self.account_list = accounts
             self.account_cycle = itertools.cycle(accounts)
             print(f"[INFO] 刷新账号池: {len(accounts)} 个可用账号")
