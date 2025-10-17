@@ -1,0 +1,19 @@
+# CapCut API 服务端依赖 - Render 部署版本
+
+# Flask Web 框架
+Flask==2.3.0
+Werkzeug==2.3.0
+
+# HTTP 请求库
+requests==2.31.0
+
+# 生产环境服务器（必须）
+gunicorn==21.2.0
+
+# 可选：Redis 支持（如果需要）
+# redis==5.0.0
+
+# 可选：监控和日志
+# sentry-sdk[flask]==1.40.0
+
+
