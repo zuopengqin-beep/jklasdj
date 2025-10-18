@@ -1055,9 +1055,18 @@ class AccountDatabase:
     
     def get_statistics(self):
         """获取统计信息"""
-        total = len(self.accounts)
-        active = len([acc for acc in self.accounts if acc['status'] == 'active'])
-        failed = len([acc for acc in self.accounts if acc['status'] == 'failed'])
+        accounts = self.accounts or []
+        total = len(accounts)
+        active = 0
+        failed = 0
+        for acc in accounts:
+            if not isinstance(acc, dict):
+                continue
+            status = acc.get('status', 'active')  # 缺省视为 active，避免 KeyError
+            if status == 'active':
+                active += 1
+            elif status == 'failed':
+                failed += 1
         return {
             'total': total,
             'active': active,
@@ -3263,6 +3272,4 @@ if __name__ == "__main__":
         app = Application()
         app.mainloop()
     else:
-        print("Headless mode: GUI disabled. Core APIs are available for import.")
-
-# --- END OF FILE jimeng003.py (with model selection) ---
+        print("Headless mode: GUI disabled. Core APIs are available for import.")-
