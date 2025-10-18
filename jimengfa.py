@@ -3272,4 +3272,4 @@ if __name__ == "__main__":
         app = Application()
         app.mainloop()
     else:
-        print("Headless mode: GUI disabled. Core APIs are available for import.")-
+        print("Headless mode: GUI disabled. Core APIs are available for import.")
